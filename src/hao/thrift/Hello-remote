@@ -25,6 +25,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print 'Functions:'
   print '  string echoDemo(Demo demo)'
   print '  string echoHello(string str)'
+  print '  void uploadFile(string binaryData, string filePath, i16 flag)'
   print ''
   sys.exit(0)
 
@@ -87,6 +88,12 @@ elif cmd == 'echoHello':
     print 'echoHello requires 1 args'
     sys.exit(1)
   pp.pprint(client.echoHello(args[0],))
+
+elif cmd == 'uploadFile':
+  if len(args) != 3:
+    print 'uploadFile requires 3 args'
+    sys.exit(1)
+  pp.pprint(client.uploadFile(args[0],args[1],eval(args[2]),))
 
 else:
   print 'Unrecognized method %s' % cmd

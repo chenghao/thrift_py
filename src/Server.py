@@ -9,12 +9,24 @@ from thrift.server import TServer
 
 class HelloHandler(Hello.Iface): 
     def echoDemo(self, demo): 
-        return "Demo: name=" + demo.name + "  age=" + str(demo.age);
-          
-    def echoHello(self, param): 
+        return "Demo: name=" + demo.name + "  age=" + str(demo.age)
+
+    def echoHello(self, param):
         result = "你发的字符串是：" + param 
-        return result 
-    
+        return result
+
+    def uploadFile(self, binaryData, filePath, flag):
+        import os
+        if flag == 0:
+            if os.path.exists(filePath):
+                os.remove(filePath)
+        # 以追加模式+二进制模式打开
+        fp = open(filePath, "ab")
+        try:
+            fp.write(binaryData)
+        finally:
+            fp.close()
+
 handler = HelloHandler() 
 processor = Hello.Processor(handler)     
   

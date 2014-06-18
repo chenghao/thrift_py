@@ -32,6 +32,15 @@ class Iface:
     """
     pass
 
+  def uploadFile(self, binaryData, filePath, flag):
+    """
+    Parameters:
+     - binaryData
+     - filePath
+     - flag
+    """
+    pass
+
 
 class Client(Iface):
   def __init__(self, iprot, oprot=None):
@@ -100,6 +109,38 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "echoHello failed: unknown result");
 
+  def uploadFile(self, binaryData, filePath, flag):
+    """
+    Parameters:
+     - binaryData
+     - filePath
+     - flag
+    """
+    self.send_uploadFile(binaryData, filePath, flag)
+    self.recv_uploadFile()
+
+  def send_uploadFile(self, binaryData, filePath, flag):
+    self._oprot.writeMessageBegin('uploadFile', TMessageType.CALL, self._seqid)
+    args = uploadFile_args()
+    args.binaryData = binaryData
+    args.filePath = filePath
+    args.flag = flag
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_uploadFile(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = uploadFile_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    return
+
 
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
@@ -107,6 +148,7 @@ class Processor(Iface, TProcessor):
     self._processMap = {}
     self._processMap["echoDemo"] = Processor.process_echoDemo
     self._processMap["echoHello"] = Processor.process_echoHello
+    self._processMap["uploadFile"] = Processor.process_uploadFile
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -141,6 +183,17 @@ class Processor(Iface, TProcessor):
     result = echoHello_result()
     result.success = self._handler.echoHello(args.str)
     oprot.writeMessageBegin("echoHello", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_uploadFile(self, seqid, iprot, oprot):
+    args = uploadFile_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = uploadFile_result()
+    self._handler.uploadFile(args.binaryData, args.filePath, args.flag)
+    oprot.writeMessageBegin("uploadFile", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -369,6 +422,132 @@ class echoHello_result:
       oprot.writeFieldBegin('success', TType.STRING, 0)
       oprot.writeString(self.success)
       oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class uploadFile_args:
+  """
+  Attributes:
+   - binaryData
+   - filePath
+   - flag
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'binaryData', None, None, ), # 1
+    (2, TType.STRING, 'filePath', None, None, ), # 2
+    (3, TType.I16, 'flag', None, None, ), # 3
+  )
+
+  def __init__(self, binaryData=None, filePath=None, flag=None,):
+    self.binaryData = binaryData
+    self.filePath = filePath
+    self.flag = flag
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.binaryData = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.filePath = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.I16:
+          self.flag = iprot.readI16();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('uploadFile_args')
+    if self.binaryData is not None:
+      oprot.writeFieldBegin('binaryData', TType.STRING, 1)
+      oprot.writeString(self.binaryData)
+      oprot.writeFieldEnd()
+    if self.filePath is not None:
+      oprot.writeFieldBegin('filePath', TType.STRING, 2)
+      oprot.writeString(self.filePath)
+      oprot.writeFieldEnd()
+    if self.flag is not None:
+      oprot.writeFieldBegin('flag', TType.I16, 3)
+      oprot.writeI16(self.flag)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class uploadFile_result:
+
+  thrift_spec = (
+  )
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('uploadFile_result')
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
