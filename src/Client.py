@@ -9,7 +9,7 @@ from thrift.protocol import TCompactProtocol
 from hao.thrift.ttypes import Demo
 
 try:
-    socket = TSocket.TSocket(host="localhost",port=9000)
+    socket = TSocket.TSocket(host="localhost", port=9000)
     transport = TTransport.TFramedTransport(socket)
     protocol = TCompactProtocol.TCompactProtocol(transport)
     

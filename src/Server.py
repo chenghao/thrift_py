@@ -7,7 +7,9 @@ from thrift.transport import TSocket
 from thrift.protocol import TCompactProtocol 
 from thrift.server import TServer 
 
-class HelloHandler(Hello.Iface): 
+
+class HelloHandler(Hello.Iface):
+
     def echoDemo(self, demo): 
         return "Demo: name=" + demo.name + "  age=" + str(demo.age)
 
